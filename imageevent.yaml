@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: imgeventfilter
+  name: imgeventfilter
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: imgeventfilter
+    spec:
+      containers:
+      - image: registry.paas/library/imgeventfilter:v0.1
+        imagePullPolicy: Always
+        name: imgeventfilter
+        ports:
+        - name: 
+          containerPort: 8089
+        env:
+        - name: hookurl
+          value: "http://10.142.21.141:8080/v1/image/webhook"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: imgeventfilter
+  name: imgeventfilter
+  namespace: kube-system
+spec:
+  type: NodePort
+  ports:
+  - name: imgeventfilter
+    port: 8089
+    protocol: TCP
+    targetPort: 8089
+    nodePort: 32087
+  selector:
+    app: imgeventfilter
